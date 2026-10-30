@@ -20,6 +20,7 @@ IGNORE = {
     "checkpoints",
 }
 FORBIDDEN = {".pt", ".pth", ".safetensors", ".zip", ".gz", ".tar", ".jpg", ".jpeg", ".png", ".mp4"}
+RUNTIME_ROOTS = {".venv", "data", "runs", "outputs", "reports", "cache", "checkpoints"}
 PATHS = re.compile(r"/" + r"(?:home|mnt|SharedFolder)/")
 ADDRESS = re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])")
 TOKEN = re.compile(r"(?:hf_|ghp_)[A-Za-z0-9]{20,}")
@@ -30,7 +31,9 @@ def audit(root):
     checked = 0
     for path in Path(root).rglob("*"):
         relative = path.relative_to(root)
-        if any(part in IGNORE or part.endswith(".egg-info") for part in relative.parts):
+        if relative.parts[0] in RUNTIME_ROOTS or any(
+            part in IGNORE - RUNTIME_ROOTS or part.endswith(".egg-info") for part in relative.parts
+        ):
             continue
         if path.is_symlink():
             problems.append(f"{relative}: source symlink is not a standalone public file")
