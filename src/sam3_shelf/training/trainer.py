@@ -87,7 +87,7 @@ def code_identity(method):
     )
     paths = {package / name for name in names}
     paths.update(
-        Path(inspect.getfile(cls))
+        Path(inspect.getfile(cls)).resolve()
         for cls in type(method).__mro__
         if cls.__module__.startswith("sam3_shelf.")
     )
