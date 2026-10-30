@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "code_repository": "https://github.com/sdoqb15/sam3_shelf",
+  "models": {
+    "c7a": {
+      "repo_id": "sdoqb15/sam3-shelf-c7a-2380",
+      "revision": "7d8d6b0670e6e9e0dc037cb3b0a2d2a3ac4eebca",
+      "step": 2380,
+      "weights_sha256": "c7fa128e92b20c19e9a36a357a94a9d625e2314139e870f13a1f11476ccf5389"
+    },
+    "d2-2261": {
+      "repo_id": "sdoqb15/sam3-shelf-d2-2261",
+      "revision": "06171cfcb8aad4a3ab8038a53fe29de06adf88e4",
+      "step": 2261,
+      "weights_sha256": "fef9906a67ed8fe3c93e402a7345e7318ad1b32c6081dc4828fb32feee7c5fb0"
+    }
+  }
+}

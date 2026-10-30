@@ -17,7 +17,7 @@ internal experiment history, server addresses, or one-off migration scripts.
 The code license has **not yet been selected**; see [release status](LICENSE_PENDING.md).
 
 本仓库只保留可复用核心。私有数据、权重和完整内部实验历史另行保存。
-**代码许可证待确认，目前尚未公开发布或添加开源授权条款。**
+**代码许可证待确认，尚未添加开源授权条款。源代码可见不等于已授予开源许可。**
 
 ## Start here / 从这里开始
 
@@ -28,6 +28,7 @@ The code license has **not yet been selected**; see [release status](LICENSE_PEN
 | Prepare data / 准备标注 | [Data format](docs/data.md) |
 | Train or resume / 训练与恢复 | [Training](docs/training.md) |
 | Evaluate and compare / 评测与可视化 | [Evaluation](docs/evaluation.md) |
+| Download associated weights / 下载配套权重 | [Pretrained models](docs/pretrained_models.md) |
 | Trace the method / 了解方法及依据 | [Methods](docs/methods.md) · [References](docs/references.md) |
 | Prepare a release / 开源准备 | [Release](docs/release.md) |
 

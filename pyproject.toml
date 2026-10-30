@@ -20,6 +20,9 @@ dependencies = [
 [project.scripts]
 sam3-shelf = "sam3_shelf.cli:main"
 
+[project.urls]
+Repository = "https://github.com/sdoqb15/sam3_shelf"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
