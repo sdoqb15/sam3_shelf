@@ -20,6 +20,24 @@ manifest directory, or the explicit `--data-root`/recipe `data.root`.
 Mark a multi-image source explicitly even when a particular image has only one
 GT. If `sampling_group` is omitted, one GT defaults to `single`, otherwise `multi`.
 
+## Product information / 商品信息
+
+An image can contain several products; product information belongs to each
+`instances[]` entry alongside its mask. The private snapshot preserves optional
+`mask_id`, `sku_id`, `sku_name`, `origin`, `area` and `bbox_xyxy` fields. Original
+descriptions, colors and proposal scores are retained as annotation provenance
+when provided. Unknown SKU values remain `null`.
+
+多商品图中，每个mask分别对应自己的商品ID和名称。单图原有的`c_sku_key`/`aux_sku_key`
+也予以保留；其中条码分组键和平台SKU ID不能直接混用，不会从文件名猜测填充未知SKU。
+`source_image_name`保留原图名，完整原始注释JSON可按`annotation_metadata_file`和
+`annotation_metadata_id`查阅`metadata/source_annotations.jsonl`。
+
+The reader preserves extra metadata fields. Training uses mask geometry and the
+fixed prompt `an object on the shelf`; it does not replace the prompt with SKU
+names. `annotation_score` is a source annotation/proposal score, separate from
+the model confidence returned at inference.
+
 ## Mask semantics / Mask含义
 
 - Transparent multipack: one complete package GT, not one GT per internal item.

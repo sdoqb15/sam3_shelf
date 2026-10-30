@@ -41,13 +41,14 @@ Download its pinned version after authenticating with an authorized account:
 
 ```bash
 hf download sdoqb15/sam3-shelf-data --repo-type dataset \
-  --revision babbacb4f2b7e4339d96ff7d1a910522e21152be --local-dir data/private-snapshot
+  --revision 31222db7e31f875fcac3eb48a83ee58bd2ae2462 --local-dir data/private-snapshot
 cd data/private-snapshot
 sha256sum -c SHA256SUMS
 for archive in archives/*.tar.gz; do tar -xzf "$archive"; done
 ```
 
-Portable JSONL files are in `manifests/`. C7-A never trained on the regression
+Portable JSONL files are in `manifests/`; product/annotation metadata are preserved
+per instance and in `metadata/source_annotations.jsonl` (see [data format](data.md)). C7-A never trained on the regression
 or supplemental data; D2 included the old regression and annotated supplemental
 data. Unannotated images have no `instances` field and must not be treated as
 fully negative training examples.
