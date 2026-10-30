@@ -2,6 +2,11 @@
 
 Code repository: <https://github.com/sdoqb15/sam3_shelf>.
 
+These checkpoints target complete shelf sale units and useful candidate ranking
+for downstream SKU-vector matching and robot picking. See the
+[problem background](problem_statement.md), especially transparent multipacks and
+columns whose current outermost items change after stock removal.
+
 | Model / 模型 | Hugging Face | Selected checkpoint / 权重 |
 |---|---|---|
 | C7-A | [sam3-shelf-c7a-2380](https://huggingface.co/sdoqb15/sam3-shelf-c7a-2380) | Joint-stage validation BEST, step 2380 |
@@ -36,7 +41,7 @@ Download its pinned version after authenticating with an authorized account:
 
 ```bash
 hf download sdoqb15/sam3-shelf-data --repo-type dataset \
-  --revision 882b760a80a748256f5020aa8673958b4a72f905 --local-dir data/private-snapshot
+  --revision babbacb4f2b7e4339d96ff7d1a910522e21152be --local-dir data/private-snapshot
 cd data/private-snapshot
 sha256sum -c SHA256SUMS
 for archive in archives/*.tar.gz; do tar -xzf "$archive"; done

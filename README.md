@@ -12,6 +12,29 @@ matching, with explicit score filtering and near-duplicate suppression.
 以标注的销售单元为目标：透明组合装标成一个GT时，学习输出完整的一包。
 默认输出所有保留候选，供下游匹配；不依赖GT框、SKU名称或GT辅助筛选。
 
+## Background and goal / 问题背景与目标
+
+Original SAM3 can segment many shelf products, but in our scenes it can split a
+transparent-film multipack into its individual contents or return an incomplete
+package mask. Its confidence ordering does not consistently prioritize complete,
+currently exposed outermost items. Front/back merges and irrelevant regions can
+also produce unhelpful candidates, including after poorly targeted fine-tuning.
+
+Downstream systems embed masked crops and match them against a SKU vector
+database before selecting a mask for robot picking. A fragment, merged product
+or poorly ranked complete candidate can confuse that matching and propagate an
+incorrect instance region into picking plans. This project aims to improve
+**complete sale-unit masks and their ranking** under the same fixed prompt.
+
+原始SAM3虽然能分割许多货架商品，但容易将**透明薄膜绑在一起的多个相同商品**拆成内部
+单品，或只分割完整包装的一部分；当前最外侧完整商品的mask也不一定优先返回。这会使
+下游mask向量库匹配拿到残缺或混合外观，影响SKU匹配、mask挑选以及机器人抓取目标和
+区域估计。部分微调还会把包含前后商品的杂乱mask排得过高。
+
+目标是让**完整单个销售单元**（包括完整组合装）的候选可被召回并合理靠前，同时保留
+有用的后排候选。各列的“最前排”会随商品移除而变化，靠里的商品露出后也属于当前目标。
+详见[问题背景、下游影响与任务边界](docs/problem_statement.md)。
+
 This repository contains the reusable core, not private datasets, model weights,
 internal experiment history, server addresses, or one-off migration scripts.
 The code license has **not yet been selected**; see [release status](LICENSE_PENDING.md).
@@ -23,6 +46,7 @@ The code license has **not yet been selected**; see [release status](LICENSE_PEN
 
 | You want to… / 目标 | Read / 文档 |
 |---|---|
+| Understand the problem and downstream use / 理解背景与下游用途 | [Problem statement](docs/problem_statement.md) |
 | Understand the architecture / 理解架构 | [Architecture](docs/architecture.md) |
 | Add another method / 增加实验方法 | [Experiment development](docs/experiments.md) |
 | Prepare data / 准备标注 | [Data format](docs/data.md) |
