@@ -29,5 +29,23 @@ not make network requests.
 The associated dataset is private: `sdoqb15/sam3-shelf-data`. Access is controlled
 by the dataset owner. Private data access and the SAM model license are separate.
 
+The private snapshot contains C7-A's train1635/validation72/test162 images,
+35 annotated supplemental images and165 unannotated supplemental views. The
+annotation and unannotated supplemental lists can refer to the same scene/image.
+Download its pinned version after authenticating with an authorized account:
+
+```bash
+hf download sdoqb15/sam3-shelf-data --repo-type dataset \
+  --revision 882b760a80a748256f5020aa8673958b4a72f905 --local-dir data/private-snapshot
+cd data/private-snapshot
+sha256sum -c SHA256SUMS
+for archive in archives/*.tar.gz; do tar -xzf "$archive"; done
+```
+
+Portable JSONL files are in `manifests/`. C7-A never trained on the regression
+or supplemental data; D2 included the old regression and annotated supplemental
+data. Unannotated images have no `instances` field and must not be treated as
+fully negative training examples.
+
 Weights retain the upstream SAM License supplied in their HF repositories.
 The code license remains undecided; no new code-license grant is implied.

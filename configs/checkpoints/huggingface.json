@@ -14,5 +14,11 @@
       "step": 2261,
       "weights_sha256": "fef9906a67ed8fe3c93e402a7345e7318ad1b32c6081dc4828fb32feee7c5fb0"
     }
+  },
+  "private_dataset": {
+    "repo_id": "sdoqb15/sam3-shelf-data",
+    "repo_type": "dataset",
+    "revision": "882b760a80a748256f5020aa8673958b4a72f905",
+    "private": true
   }
 }
