@@ -1,0 +1,42 @@
+{
+  "extends": "c7a_reference.json",
+  "experiment": {
+    "name": "delivery_joint"
+  },
+  "output_dir": "../../runs/delivery_joint",
+  "training": {
+    "minimum_updates": 2261,
+    "patience": 12
+  },
+  "evaluation_checkpoint": "final",
+  "data": {
+    "train": "../../data/delivery_train.jsonl"
+  },
+  "evaluations": [
+    {
+      "name": "validation",
+      "manifest": "../../data/validation.jsonl",
+      "scope": "validation",
+      "compare_baseline": true
+    },
+    {
+      "name": "former_test",
+      "manifest": "../../data/test.jsonl",
+      "scope": "training_fit",
+      "compare_baseline": true,
+      "benchmark": true
+    },
+    {
+      "name": "front_annotations",
+      "manifest": "../../data/front_annotations.jsonl",
+      "scope": "training_fit",
+      "compare_baseline": true
+    },
+    {
+      "name": "unlabeled",
+      "manifest": "../../data/unlabeled.jsonl",
+      "scope": "unlabeled",
+      "compare_baseline": true
+    }
+  ]
+}

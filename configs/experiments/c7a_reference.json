@@ -1,0 +1,29 @@
+{
+  "extends": "../methods/c7a_joint.json",
+  "experiment": {
+    "name": "c7a_reference"
+  },
+  "model": "../../checkpoints/base",
+  "output_dir": "../../runs/c7a_reference",
+  "teacher_cache": "../../cache/original_teacher",
+  "data": {
+    "train": "../../data/train.jsonl",
+    "validation": "../../data/validation.jsonl",
+    "root": null
+  },
+  "evaluations": [
+    {
+      "name": "validation",
+      "manifest": "../../data/validation.jsonl",
+      "scope": "validation",
+      "compare_baseline": true
+    },
+    {
+      "name": "test",
+      "manifest": "../../data/test.jsonl",
+      "scope": "held_out_test",
+      "compare_baseline": true,
+      "benchmark": true
+    }
+  ]
+}

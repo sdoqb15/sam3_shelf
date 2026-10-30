@@ -1,0 +1,9 @@
+{
+  "extends": "c7a_reference.json",
+  "experiment": {
+    "name": "score_only_focal_control"
+  },
+  "method": "score_only_focal_control",
+  "method_plugin": "sam3_shelf.methods.example",
+  "output_dir": "../../runs/score_only_control"
+}

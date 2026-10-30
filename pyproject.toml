@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sam3-shelf"
+version = "0.1.0"
+description = "Reproducible SAM3 fine-tuning and complete retail-instance evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26,<3",
+  "Pillow>=10,<13",
+  "scipy>=1.11,<2",
+  "torch>=2.5,<2.6",
+  "transformers==5.12.1",
+  "safetensors>=0.4,<1",
+]
+
+[project.scripts]
+sam3-shelf = "sam3_shelf.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sam3_shelf = ["assets/*.html", "assets/*.js", "assets/*.css"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -1,0 +1,8 @@
+{
+  "extends": "c7a_reference.json",
+  "experiment": {
+    "name": "supervised_control"
+  },
+  "method": "supervised_joint",
+  "output_dir": "../../runs/supervised_control"
+}

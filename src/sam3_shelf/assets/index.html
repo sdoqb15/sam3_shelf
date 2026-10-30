@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SAM3 Shelf · Model comparison</title>
+  <link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+  <header><h1>SAM3 Shelf</h1><p>Complete retail-instance masks · actual model outputs</p></header>
+  <main>
+    <section class="controls" aria-label="Review controls">
+      <label>Image <select id="image"></select></label>
+      <button id="previous" type="button">Previous</button><button id="next" type="button">Next</button>
+      <label>Layer <select id="layer"><option value="all">All candidates</option><option value="topn">TOP-N by score</option><option value="gt">Ground truth</option></select></label>
+      <label>N <input id="topn" type="number" value="5" min="1" max="200"></label>
+      <fieldset id="models"><legend>Models</legend></fieldset>
+    </section>
+    <p id="status" role="status">Loading evaluation manifest…</p>
+    <section id="summary" class="grid" aria-label="Evaluation metrics"></section>
+    <section id="gallery" class="grid" aria-label="Native mask overlays"></section>
+  </main>
+  <script src="viewer.js"></script>
+</body>
+</html>

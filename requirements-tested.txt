@@ -1,0 +1,8 @@
+# Reference environment used to validate the refactoring. Install PyTorch for
+# your CUDA platform separately; the original environment used CUDA 12.1.
+torch==2.5.1
+transformers==5.12.1
+numpy==2.4.4
+scipy==1.18.0
+Pillow==12.2.0
+safetensors==0.8.0

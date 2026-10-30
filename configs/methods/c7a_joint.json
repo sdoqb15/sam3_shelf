@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "method": "c7a_joint",
+  "prompt": "an object on the shelf",
+  "sampling": {
+    "multi_weight": 8,
+    "single_weight": 1,
+    "seed_namespace": "c2"
+  },
+  "optimizer": {
+    "lr": 1e-05,
+    "tail_lr": 1e-06,
+    "schedule_updates": 2380,
+    "warmup_fraction": 0.05,
+    "weight_decay": 0.0001,
+    "clip_norm": 1.0
+  },
+  "training": {
+    "seed": 42,
+    "gradient_accumulation": 4,
+    "validation_interval": 119,
+    "minimum_updates": 1190,
+    "patience": 8,
+    "max_updates": null,
+    "workers": 2,
+    "cpu_threads": 4,
+    "deterministic": true,
+    "log_interval": 25
+  },
+  "teacher_policy": {
+    "selection_score_min": 0.9,
+    "unknown_score_min": 0.85,
+    "max_union_gt_intersection_over_teacher_area": 0.02,
+    "max_teacher_intersection_over_each_gt_area": 0.02,
+    "mask_nms_iou": 0.98,
+    "max_training_teacher_candidates": 32,
+    "geometry_match_min_iou": 0.5,
+    "loss_weight": 0.25
+  },
+  "inference": {
+    "score_threshold": 0.1,
+    "mask_threshold": 0.5,
+    "mask_nms_iou": 0.98
+  },
+  "evaluation_checkpoint": "best"
+}
