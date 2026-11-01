@@ -43,3 +43,25 @@ quality must explicitly define its targets and negative/unknown treatment.
 
 The framework retains SAM3's architecture. It does not implement an independent
 MaskIoU quality head or reproduce the complete official SAM3 training system.
+
+### Frozen TOP-N scoring
+
+`topn_score` (plugin `sam3_shelf.methods.topn_score`) uses the shared trainer and
+freezes all modules except `dot_product_scoring`. Start from a completed parent
+checkpoint and provide its SHA256 through `score_calibration.parent_weights_sha256`.
+The recipe template is `configs/methods/topn_score.json`.
+
+The method promotes one complete candidate per annotated GT only when its parent
+rank misses a reachable TOP-N target (including a newly displaced current candidate). Competitor cutoffs are detached; unannotated
+candidates do not receive background labels. Confirmed merges/fragments have
+separate normalized losses. Other complete and unknown candidates retain explicit
+score anchors. Parent geometry and scores are cached on the server without raw
+mask tensors. Validation checks all raw mask/box/presence geometry, retained GT
+identities, confirmed error counts/ranks and protected candidate scores before
+selecting a checkpoint. A parent-equivalent step-zero checkpoint remains a valid
+fallback; this method does not guarantee an improvement on unseen images.
+
+Training and validation use the deployment inference backend to avoid attaching
+cached geometry labels to a different numerical forward. Checkpoints retain the
+standard SAM3 architecture and normal inference API. Geometry freezing alone does
+not preserve the threshold/NMS output set; inspect actual-output regressions.

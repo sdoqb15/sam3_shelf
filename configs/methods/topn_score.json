@@ -1,0 +1,37 @@
+{
+  "extends": "c7a_joint.json",
+  "method": "topn_score",
+  "method_plugin": "sam3_shelf.methods.topn_score",
+  "optimizer": {
+    "schedule_updates": 1190
+  },
+  "training": {
+    "deterministic": false
+  },
+  "score_calibration": {
+    "top_ns": [
+      5,
+      10
+    ],
+    "rank_margin": 0.2,
+    "error_margin": 1.0,
+    "negative_score_ceiling": 0.05,
+    "complete_coverage": 0.95,
+    "complete_purity": 0.95,
+    "merge_coverage": 0.8,
+    "merge_purity_max": 0.7,
+    "fragment_coverage_min": 0.2,
+    "fragment_coverage_max": 0.8,
+    "fragment_purity": 0.98,
+    "safe_gt_overlap": 0.02,
+    "protected_min_score": 0.9,
+    "rank_weight": 1.0,
+    "error_rank_weight": 0.5,
+    "negative_weight": 1.0,
+    "complete_anchor_weight": 2.0,
+    "rear_anchor_weight": 2.0,
+    "unknown_anchor_weight": 0.5,
+    "maximum_rear_mean_score_drop": 0.02,
+    "maximum_rear_score_drop": 0.1
+  }
+}
