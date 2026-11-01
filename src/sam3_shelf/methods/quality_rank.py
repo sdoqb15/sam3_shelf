@@ -164,6 +164,42 @@ class FrozenQualityRank(FrozenTopNScore):
         write_json(Path(config['output_dir'])/'teacher_resources.json',resource)
         return resource
 
+    def validate(self,model,processor,rows,config):
+        # Observe the same native forwards; no second image inference pass.
+        captured=[]
+        def observe(module,args,value):
+            captured.append(value[-1,0,:,0].detach().float().cpu())
+        handle=model.dot_product_scoring.register_forward_hook(observe)
+        try:
+            metrics=super().validate(model,processor,rows,config)
+        finally:
+            handle.remove()
+        if len(captured)!=len(rows):raise RuntimeError('Expected one scoring observation per validation image')
+        pairs=[];floors=[];spec=config['quality_rank']
+        for row,current in zip(rows,captured):
+            record=self.load_teacher(row,config,{})
+            t=quality_targets(record,config['score_calibration'],spec)
+            parent=record['class_logits'].float().reshape(-1)
+            presence=float(record['presence'].reshape(-1)[0])
+            for g,q in t['primary']:
+                for group,margin,name in [(t['bad'][g],spec['strong_margin'],'strong'),(t['weak'][g],spec['weak_margin'],'weak')]:
+                    idx=torch.as_tensor(np.flatnonzero(group),dtype=torch.long)
+                    if not len(idx):continue
+                    before=float(parent[q]-parent[idx].max())
+                    if before>=margin:continue
+                    after=float(current[q]-current[idx].max())
+                    pairs.append(dict(kind=name,parent_gap=before,current_gap=after,margin=margin))
+                if presence>.1 and float(record['scores'][q])<=.1:
+                    floors.append(float(current[q].sigmoid())*presence)
+        metrics['quality_rank_progress']=dict(fixed_parent_hard_pairs=len(pairs),
+            parent_gap_mean=float(np.mean([p['parent_gap'] for p in pairs])) if pairs else 0.,
+            current_gap_mean=float(np.mean([p['current_gap'] for p in pairs])) if pairs else 0.,
+            mean_gap_gain=float(np.mean([p['current_gap']-p['parent_gap'] for p in pairs])) if pairs else 0.,
+            satisfied_pairs=sum(p['current_gap']>=p['margin'] for p in pairs),
+            fixed_floor_gt=len(floors),raw_floor_gt_above_threshold=sum(score>.1 for score in floors),
+            scope='Continuous logit-gap observation on fixed parent-hard GT quality pairs; checkpoint ranking/guards unchanged.')
+        return metrics
+
     def sample_rows(self,rows,start,end,config):
         strategy=config['sampling'].get('strategy','weighted')
         if strategy=='weighted':
