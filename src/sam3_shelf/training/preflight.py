@@ -27,13 +27,14 @@ def preflight(config_path):
     settings = config["training"]
     interval = settings["validation_interval"]
     cycle_end = math.ceil(weighted / settings["gradient_accumulation"] / interval) * interval
-    settings["effective_minimum_updates"] = max(settings["minimum_updates"], cycle_end)
+    settings["effective_minimum_updates"] = (max(settings["minimum_updates"], cycle_end)
+        if settings.get("require_full_cycle", True) else settings["minimum_updates"])
     if (
         settings["max_updates"] is not None
         and settings["max_updates"] < settings["effective_minimum_updates"]
     ):
         raise ValueError(
-            "max_updates is smaller than the minimum needed for a complete weighted cycle"
+            "max_updates is smaller than the configured effective minimum"
         )
     model = Path(config["model"])
     required = (
@@ -83,6 +84,7 @@ def preflight(config_path):
         train=train_audit,
         validation=val_audit,
         weighted_cycle_exposures=weighted,
+        require_full_cycle=settings.get("require_full_cycle", True),
         effective_minimum_updates=settings["effective_minimum_updates"],
         identity=identity,
     )

@@ -1,6 +1,8 @@
 """One resumable trainer shared by experiment configs and method plugins."""
 
 import gc
+import copy
+from collections import Counter
 import fcntl
 import math
 import os
@@ -20,6 +22,9 @@ from .sampling import weighted_rows
 
 
 def training_rows(config, rows, start, end):
+    method=get_method(config)
+    if hasattr(method,"sample_rows"):
+        return method.sample_rows(rows,start,end,config)
     return weighted_rows(
         rows,
         start,
@@ -94,7 +99,7 @@ def code_identity(method):
     return {str(p.relative_to(package)): file_sha256(p) for p in sorted(paths)}
 
 
-def _train(config_path, device="cuda:0", resume=False):
+def _train(config_path, device="cuda:0", resume=False, preflight_result=None):
     import torch
     from torch.utils.data import Dataset, DataLoader
 
@@ -102,7 +107,15 @@ def _train(config_path, device="cuda:0", resume=False):
         raise ValueError(
             "The reference trainer requires CUDA; use train --check-only for CPU preflight"
         )
-    config, rows, validation, audit = preflight(config_path)
+    if preflight_result is None:
+        config, rows, validation, audit = preflight(config_path)
+    else:
+        from ..config import load_recipe
+        config, rows, validation, audit = preflight_result
+        clean=copy.deepcopy(config)
+        clean['training'].pop('effective_minimum_updates',None)
+        if clean!=load_recipe(config_path):
+            raise ValueError('Prepared preflight belongs to a different recipe')
     method = get_method(config)
     out = Path(config["output_dir"])
     identity = dict(**audit["identity"], code_sha256=code_identity(method))
@@ -320,6 +333,7 @@ def _train(config_path, device="cuda:0", resume=False):
         )
         optimizer.zero_grad(set_to_none=True)
         micro = 0
+        micro_losses=[];micro_details=[]
         torch.cuda.reset_peak_memory_stats()
         started = time.perf_counter()
         for inputs, targets, teacher in loader:
@@ -340,6 +354,7 @@ def _train(config_path, device="cuda:0", resume=False):
             if not torch.isfinite(loss):
                 raise FloatingPointError(details)
             micro += 1
+            micro_losses.append(float(loss.detach()));micro_details.append(details)
             del output, inputs
             if micro < accumulation:
                 continue
@@ -355,12 +370,17 @@ def _train(config_path, device="cuda:0", resume=False):
                     out / "train.jsonl",
                     dict(
                         step=step,
-                        loss=float(loss.detach()),
+                        loss=sum(micro_losses)/len(micro_losses),
                         lr=lr,
                         gradient_norm=float(norm),
-                        details=details,
+                        gradient_clipped=bool(norm>config["optimizer"]["clip_norm"]),
+                        microbatches=len(micro_details),
+                        sample_buckets=dict(Counter(d.get("sample_bucket","untracked") for d in micro_details)),
+                        details={k:sum(float(d[k]) for d in micro_details)/len(micro_details)
+                                 for k in micro_details[0] if isinstance(micro_details[0][k],(int,float))},
                     ),
                 )
+            micro_losses=[];micro_details=[]
         if step != end or micro:
             raise RuntimeError("Incomplete accumulated update interval")
         torch.cuda.synchronize()
@@ -395,7 +415,7 @@ def _train(config_path, device="cuda:0", resume=False):
     return result
 
 
-def train(config_path, device="cuda:0", resume=False):
+def train(config_path, device="cuda:0", resume=False, preflight_result=None):
     from ..config import load_recipe
 
     output = Path(load_recipe(config_path)["output_dir"])
@@ -405,4 +425,4 @@ def train(config_path, device="cuda:0", resume=False):
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise RuntimeError("Another trainer is using this output directory") from None
-        return _train(config_path, device, resume)
+        return _train(config_path, device, resume, preflight_result)

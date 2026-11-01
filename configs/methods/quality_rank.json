@@ -1,0 +1,28 @@
+{
+  "extends": "topn_score.json",
+  "method": "quality_rank",
+  "method_plugin": "sam3_shelf.methods.quality_rank",
+  "sampling": {
+    "strategy": "weighted"
+  },
+  "training": {
+    "minimum_updates": 1190,
+    "max_updates": 1190,
+    "require_full_cycle": false,
+    "log_interval": 1
+  },
+  "quality_rank": {
+    "weak_quality_max": 0.9,
+    "strong_margin": 1.0,
+    "weak_margin": 0.2,
+    "max_pairs_per_gt": 3,
+    "positive_floor_score": 0.12,
+    "strong_rank_weight": 1.0,
+    "weak_rank_weight": 0.25,
+    "positive_floor_weight": 1.0,
+    "negative_weight": 1.0,
+    "complete_anchor_weight": 2.0,
+    "rear_anchor_weight": 2.0,
+    "unknown_anchor_weight": 0.5
+  }
+}

@@ -65,3 +65,27 @@ Training and validation use the deployment inference backend to avoid attaching
 cached geometry labels to a different numerical forward. Checkpoints retain the
 standard SAM3 architecture and normal inference API. Geometry freezing alone does
 not preserve the threshold/NMS output set; inspect actual-output regressions.
+
+### GT-supported quality ranking and sampling controls
+
+`quality_rank` (`sam3_shelf.methods.quality_rank`) derives from the frozen scoring
+method and reuses its geometry references. Complete/confirmed-error pairs keep
+both score gradients, so the ranking term is invariant to a shared additive
+score bias. It mines at most three threatening errors per GT. A separate weak
+ranking group covers clearly GT-related intermediate-quality masks without
+assigning those masks a background target. Independent unknown instances retain
+score anchors. Full geometry and actual-output validation guards are inherited.
+
+The template `configs/methods/quality_rank.json` defines a fixed scoring pilot.
+`sampling.strategy=weighted` reproduces the original stream;
+`quality_stratified` draws a hard multi image, a hard single image, a high-score
+confirmed-error image and a normal replay image per four-exposure update. Mining
+uses training references only and is saved with model/data/target fingerprints.
+
+The shared trainer accepts the optional method `sample_rows` hook. Its default
+sampling and full-cycle minimum are unchanged. Set
+`training.require_full_cycle=false` explicitly for a fixed-budget scoring pilot;
+the available pool is then distinct from the samples actually visited. Training
+logs aggregate all accumulated microbatches. An already-validated preflight can
+be passed internally to avoid decoding the same frozen dataset twice; recipe
+identity is checked before reuse.
